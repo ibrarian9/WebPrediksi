@@ -73,9 +73,10 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
         >
             {/* <!-- SIDEBAR HEADER --> */}
             <div className="flex items-center justify-start gap-2 px-6 py-5.5 lg:py-6.5">
-                <h1 className="text-white font-extrabold text-lg">Forecasting Perolehan Minyak menggunakan Metode Double
+                <h1
+                    className="text-white font-extrabold text-lg">
+                    Forecasting Perolehan Minyak menggunakan Metode Double
                     Exponential Smoothing</h1>
-
                 <button
                     ref={trigger}
                     onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -101,9 +102,9 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
                             {/* <!-- Menu Item Dashboard --> */}
                             <li>
                                 <Link
-                                    href="/"
+                                    href={"/"}
                                     className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("calendar") &&
+                                        pathname === "/" &&
                                         "bg-graydark dark:bg-meta-4"
                                     }`}
                                 >
@@ -116,9 +117,9 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
                             {/* <!-- Menu Item Data Aktual --> */}
                             <li>
                                 <Link
-                                    href="/data"
+                                    href={"/data"}
                                     className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("tables") && "bg-graydark dark:bg-meta-4"
+                                        pathname.includes("data") && "bg-graydark dark:bg-meta-4"
                                     }`}
                                 >
                                     <TableCellsIcon className="size-[20px]"/>
@@ -130,32 +131,17 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
                             {/* <!-- Menu Item Forecasting --> */}
                             <li>
                                 <Link
-                                    href="/forecasting"
+                                    href={"/forecasting"}
                                     className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("tables") && "bg-graydark dark:bg-meta-4"
+                                        pathname.includes("forecasting") && "bg-graydark dark:bg-meta-4"
                                     }`}
                                 >
-                                    <TableCellsIcon className="size-[20px]"/>
+                                    <DocumentTextIcon className="size-[20px]"/>
                                     Forecasting
                                 </Link>
                             </li>
                             {/* <!-- Menu Item Forecasting --> */}
 
-
-                            {/* <!-- Menu Item Calendar --> */}
-                            <li>
-                                <Link
-                                    href="/laporan"
-                                    className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("calendar") &&
-                                        "bg-graydark dark:bg-meta-4"
-                                    }`}
-                                >
-                                    <DocumentTextIcon className="size-[20px]"/>
-                                    Laporan
-                                </Link>
-                            </li>
-                            {/* <!-- Menu Item Calendar --> */}
                         </ul>
 
                         <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
@@ -166,9 +152,9 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
                             {/* <!-- Menu Item Dashboard --> */}
                             <li>
                                 <Link
-                                    href="/akun"
+                                    href={"/akun"}
                                     className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("calendar") &&
+                                        pathname.includes("akun") &&
                                         "bg-graydark dark:bg-meta-4"
                                     }`}
                                 >
@@ -181,9 +167,9 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
                             {/* <!-- Menu Item Data Aktual --> */}
                             <li>
                                 <Link
-                                    href="/about"
+                                    href={"/about"}
                                     className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("tables") && "bg-graydark dark:bg-meta-4"
+                                        pathname.includes("about") && "bg-graydark dark:bg-meta-4"
                                     }`}
                                 >
                                     <ExclamationCircleIcon className="size-[20px]"/>

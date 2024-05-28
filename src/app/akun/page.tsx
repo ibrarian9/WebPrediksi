@@ -3,24 +3,22 @@
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import {TrashIcon} from "@heroicons/react/24/outline";
-import userData from "@/app/api/userData";
 import {useEffect, useState} from "react";
+import dataAkun from "@/app/lib/dataAkun";
 
 const Akun = () => {
 
     const [data, setData] = useState<any>()
 
     useEffect(() => {
-        userData().then(
+        dataAkun().then(
             data => {
-                return setData(data);
+                return setData(data.data);
             }
         ).catch(err => {
             console.error("failed to fetch : ", err)
         })
     }, []);
-
-    console.table(data)
 
     return (
         <>
@@ -32,16 +30,16 @@ const Akun = () => {
                         <table className={"w-full table-auto"}>
                             <thead>
                             <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                <th className="px-4 py-4 font-medium text-black dark:text-white xl:pl-11 text-center">
+                                <th className="px-4 py-4 font-medium text-black dark:text-white xl:pl-11 text-center border-2">
                                     Name
                                 </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white text-center">
+                                <th className="px-4 py-4 font-medium text-black dark:text-white text-center border-2">
                                     Email
                                 </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white text-center">
+                                <th className="px-4 py-4 font-medium text-black dark:text-white text-center border-2">
                                     Username
                                 </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white text-center">
+                                <th className="px-4 py-4 font-medium text-black dark:text-white text-center border-2">
                                     Actions
                                 </th>
                             </tr>
@@ -80,7 +78,6 @@ const Akun = () => {
                     </div>
                 </div>
             </DefaultLayout>
-
         </>
     )
 }

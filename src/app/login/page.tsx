@@ -1,13 +1,15 @@
 "use client"
 
 import {EnvelopeIcon, LockClosedIcon} from "@heroicons/react/24/outline";
-import {useState} from "react";
-import authUser from "@/app/api/authUser";
+import React, {useState} from "react";
+import authUser from "@/app/lib/authUser";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import Swal from "sweetalert2"
+import dataActual from "@/app/lib/dataActual";
+import dataAkun from "@/app/lib/dataAkun";
 
-const Login = () => {
+const Login: React.FC = () => {
 
     const router = useRouter()
     const [form, setForm] = useState({
@@ -40,6 +42,12 @@ const Login = () => {
                 title: "Login Berhasil",
                 showConfirmButton: true
             })
+            try {
+                await dataActual();
+                await dataAkun()
+            } catch (e: any) {
+                console.error("Error running:", e)
+            }
             router.push("/")
         }
     }

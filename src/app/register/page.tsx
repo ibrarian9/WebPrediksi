@@ -2,7 +2,7 @@
 
 import {EnvelopeIcon, UserIcon, LockClosedIcon, UserCircleIcon} from "@heroicons/react/24/outline";
 import Link from "next/link";
-import registerUser from "@/app/api/registerUser";
+import registerUser from "@/app/lib/registerUser";
 import {useState} from "react";
 import {useRouter} from "next/navigation";
 import Swal from "sweetalert2";

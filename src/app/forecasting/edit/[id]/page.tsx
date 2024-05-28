@@ -6,14 +6,23 @@ import Link from "next/link";
 import {useEffect, useState} from "react";
 import Swal from "sweetalert2";
 import {useRouter} from "next/navigation";
-import RumusData from "@/app/lib/rumusData";
 import useForecastItem from "@/app/stores/useForecastItem";
-import forecastAllData from "@/app/lib/forecastAllData";
+import ForecastAllData from "@/app/lib/forecastAllData";
 
+export async function detailForecast(id: number) {
 
-export async function EditRumus(formData: any) {
+    const response = await fetch(`${process.env.API_URL}/forecast/product/${id}`)
 
-    const response = await fetch(`${process.env.API_URL}/forecast/rumus/1`, {
+    if (!response.ok) {
+        throw new Error("Failed to fetch Data")
+    }
+
+    return await response.json()
+}
+
+export async function editForecast(formData: any, id: number) {
+
+    const response = await fetch(`${process.env.API_URL}/forecast/product/edit/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json"
@@ -24,35 +33,22 @@ export async function EditRumus(formData: any) {
     return await response.json()
 }
 
-export async function rumusData() {
 
-    const response = await fetch(`${process.env.API_URL}/forecast/rumus/1`)
-
-    return await response.json()
-}
-
-const Rumus = () => {
+const EditForecasting = ({params}: any) => {
 
     const router = useRouter()
-    const {setRumus, setProducts} = useForecastItem()
+    const {setProducts} = useForecastItem()
     const [formData, setForm] = useState({
-        lamda: 0,
-        lamda2: 0
+        date: "",
+        production: ""
     })
 
     useEffect(() => {
-        const fetchRumus = async () => {
-            const result = await rumusData()
-            if (result.httpStatus === 200) {
-                setForm({
-                    lamda: result.data.lamda,
-                    lamda2: result.data.lamda2
-                })
-            }
-        }
-        fetchRumus()
+        Promise.all([detailForecast(params.id)])
+            .then(([detailResult]) => {
+                setForm(detailResult.data)
+            })
     }, []);
-
 
     const handleChange = (e: any) => {
         setForm({
@@ -64,26 +60,24 @@ const Rumus = () => {
     const handleUpdate = async (e: any) => {
         e.preventDefault()
 
-        const result = await EditRumus(formData)
+        const result = await editForecast(formData, params.id)
         if (result.httpStatus === 200) {
             await Swal.fire({
                 position: "center",
                 icon: "success",
                 title: "Berhasil",
-                text: "Rumus Berhasil Diubah",
+                text: "Data Produksi Berhasil Di Ubah",
                 showConfirmButton: true
             })
-            const newProduct = await forecastAllData()
-            setProducts(newProduct.data)
-            const newData = await RumusData()
-            setRumus(newData.data)
+            const newData = await ForecastAllData();
+            setProducts(newData.data)
             router.push("/forecasting")
         } else {
             await Swal.fire({
                 position: "center",
                 icon: "error",
                 title: "Gagal",
-                text: "Rumus Gagal Diubah",
+                text: "Data Produksi Gagal Di Ubah",
                 showConfirmButton: true
             })
         }
@@ -92,7 +86,7 @@ const Rumus = () => {
     return (
         <>
             <DefaultLayout>
-                <Breadcrumb pageName={"Edit Rumus"}/>
+                <Breadcrumb pageName={"Edit Data Forecasting"}/>
                 <div className="overflow-hidden bg-white min-h-screen rounded-sm border flex justify-center
                 border-stroke shadow-default dark:border-strokedark dark:bg-boxdark">
                     <div className={"w-4/5 h-fit"}>
@@ -104,30 +98,29 @@ const Rumus = () => {
                         </div>
                         <form onSubmit={handleUpdate}>
                             <div className="py-2.5">
-                                <h5 className={"text-black-2 font-extrabold"}>Lamda 1</h5>
+                                <h5 className={"text-black-2 font-extrabold"}>Tanggal</h5>
                                 <input className={"w-full border-2 border-black p-2 rounded-md hover:border-blue-500"}
-                                       name={"lamda"}
-                                       type={"number"}
-                                       step={"0.01"}
-                                       value={formData.lamda}
+                                       name={"date"}
+                                       type={"date"}
+                                       value={formData.date}
                                        onChange={handleChange}
-                                       placeholder={"Masukkan Lamda 1"} required={true}/>
+                                       placeholder={"Masukkan Tanggal"} required={true}/>
                             </div>
                             <div className="py-2.5">
-                                <h5 className={"text-black-2 font-extrabold"}>Lamda 2</h5>
+                                <h5 className={"text-black-2 font-extrabold"}>Production</h5>
                                 <input className={"w-full border-2 border-black p-2 rounded-md hover:border-blue-500"}
-                                       name={"lamda2"}
+                                       name={"production"}
                                        type={"number"}
-                                       step={"0.01"}
-                                       value={formData.lamda2}
+                                       step={"0.001"}
+                                       value={formData.production}
                                        onChange={handleChange}
-                                       placeholder={"Masukkan Lamda 2"} required={true}/>
+                                       placeholder={"Masukkan Jumlah Produksi"} required={true}/>
                             </div>
                             <div className={"flex justify-start py-2.5"}>
                                 <button
                                     className={"py-2 px-3 bg-blue-700 text-white rounded-xl"}
                                     type={"submit"}>
-                                    Submit
+                                    Submit Data
                                 </button>
                             </div>
                         </form>
@@ -138,4 +131,4 @@ const Rumus = () => {
     )
 }
 
-export default Rumus
+export default EditForecasting

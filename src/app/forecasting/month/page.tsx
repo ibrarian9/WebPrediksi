@@ -1,35 +1,20 @@
 "use client"
 
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import Link from "next/link";
 import {useState} from "react";
 import Swal from "sweetalert2";
 import {useRouter} from "next/navigation";
+import AddMonth from "@/app/lib/addMonth";
+import MonthData from "@/app/lib/monthData";
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import useForecastItem from "@/app/stores/useForecastItem";
-import forecastAllData from "@/app/lib/forecastAllData";
 
-export async function TambahProduction(formData: any) {
-
-    const response = await fetch(`${process.env.API_URL}/forecast/product/add`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-    })
-
-    return response.json()
-}
-
-const Tambah = () => {
+const TambahMonth = () => {
 
     const router = useRouter()
-    const {setProducts} = useForecastItem()
-    const [formData, setForm] = useState({
-        date: "",
-        production: ""
-    })
+    const [formData, setForm] = useState({month: 0})
+    const {setMonth} = useForecastItem()
 
     const handleChange = (e: any) => {
         setForm({
@@ -41,24 +26,24 @@ const Tambah = () => {
     const handleUpdate = async (e: any) => {
         e.preventDefault()
 
-        const result = await TambahProduction(formData)
-        if (result.httpStatus === 201) {
+        const result = await AddMonth(formData)
+        if (result) {
             await Swal.fire({
                 position: "center",
                 icon: "success",
                 title: "Berhasil",
-                text: "Data Produksi Berhasil Ditambah",
+                text: "Bulan Berhasil Ditambah",
                 showConfirmButton: true
             })
-            const newData = await forecastAllData();
-            setProducts(newData.data);
-            router.push("/forecasting");
+            const newData = await MonthData()
+            setMonth(newData.data)
+            router.push("/forecasting")
         } else {
             await Swal.fire({
                 position: "center",
                 icon: "error",
                 title: "Gagal",
-                text: "Data Produksi Gagal Ditambah",
+                text: "Bulan Gagal Ditambah",
                 showConfirmButton: true
             })
         }
@@ -79,21 +64,13 @@ const Tambah = () => {
                         </div>
                         <form onSubmit={handleUpdate}>
                             <div className="py-2.5">
-                                <h5 className={"text-black-2 font-extrabold"}>Tanggal</h5>
+                                <h5 className={"text-black-2 font-extrabold"}>Bulan</h5>
                                 <input className={"w-full border-2 border-black p-2 rounded-md hover:border-blue-500"}
-                                       name={"date"}
-                                       type={"date"}
-                                       onChange={handleChange}
-                                       placeholder={"Masukkan Tanggal"} required={true}/>
-                            </div>
-                            <div className="py-2.5">
-                                <h5 className={"text-black-2 font-extrabold"}>Production</h5>
-                                <input className={"w-full border-2 border-black p-2 rounded-md hover:border-blue-500"}
-                                       name={"production"}
+                                       name={"month"}
                                        type={"number"}
-                                       step={"0.001"}
+                                       max={99}
                                        onChange={handleChange}
-                                       placeholder={"Masukkan Jumlah Produksi"} required={true}/>
+                                       placeholder={"Masukkan Bulan"} required={true}/>
                             </div>
                             <div className={"flex justify-start py-2.5"}>
                                 <button
@@ -110,4 +87,4 @@ const Tambah = () => {
     )
 }
 
-export default Tambah
+export default TambahMonth

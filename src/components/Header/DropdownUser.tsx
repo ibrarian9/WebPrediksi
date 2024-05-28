@@ -3,7 +3,7 @@
 import {useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import {ArrowLeftStartOnRectangleIcon, ChevronDownIcon} from "@heroicons/react/24/outline";
-import Logout from "@/app/api/logout";
+import Logout from "@/app/lib/logout";
 import {useRouter} from "next/navigation"
 import {UserCircleIcon} from "@heroicons/react/24/outline";
 import Cookies from "js-cookie";
