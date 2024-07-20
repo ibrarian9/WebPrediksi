@@ -12,109 +12,15 @@ import {ApexOptions} from "apexcharts";
 import forecastAllData from "@/app/lib/forecastAllData";
 import useForecastItem from "@/app/stores/useForecastItem";
 
-const options: ApexOptions = {
-    legend: {
-        show: false,
-        position: "top",
-        horizontalAlign: "left",
-    },
-    colors: ["#3C50E0", "#80CAEE"],
-    chart: {
-        height: 335,
-        type: "area",
-        dropShadow: {
-            enabled: true,
-            color: "#623CEA14",
-            top: 10,
-            blur: 4,
-            left: 0,
-            opacity: 0.1,
-        },
-
-        toolbar: {
-            show: false,
-        },
-    },
-    responsive: [
-        {
-            breakpoint: 1024,
-            options: {
-                chart: {
-                    height: 300,
-                },
-            },
-        },
-        {
-            breakpoint: 1366,
-            options: {
-                chart: {
-                    height: 350,
-                },
-            },
-        },
-    ],
-    stroke: {
-        width: [2, 2],
-        curve: "straight",
-    },
-
-    grid: {
-        xaxis: {
-            lines: {
-                show: true,
-            },
-        },
-        yaxis: {
-            lines: {
-                show: true,
-            },
-        },
-    },
-    dataLabels: {
-        enabled: false,
-    },
-    markers: {
-        size: 4,
-        colors: "#fff",
-        strokeColors: ["#3056D3", "#80CAEE"],
-        strokeWidth: 3,
-        strokeOpacity: 0.9,
-        strokeDashArray: 0,
-        fillOpacity: 1,
-        discrete: [],
-        hover: {
-            size: undefined,
-            sizeOffset: 5,
-        },
-    },
-    xaxis: {
-        type: "category",
-        categories: [
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-        ],
-        axisBorder: {
-            show: false,
-        },
-        axisTicks: {
-            show: false,
-        },
-    },
-    yaxis: {
-        title: {
-            style: {
-                fontSize: "0px",
-            },
-        },
-        min: 0,
-        max: 250000,
-    },
-}
-
 interface Chart {
     series: {
         name: string
         data: number[]
     }[]
+}
+
+function genapkanKeSeribuan(num: number): number {
+    return Math.ceil(num / 1000) * 1000
 }
 
 export async function monthData() {
@@ -148,6 +54,7 @@ const Forecasting: React.FC = () => {
     const {forecastEq, equation, setMonth, setProducts} = useForecastItem()
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [currentPages, setCurrentPages] = useState<number>(1)
+    const [jumlahData, setJumlahData] = useState<number[]>([])
     const [state, setState] = useState<Chart>({
         series: [
             {
@@ -168,7 +75,7 @@ const Forecasting: React.FC = () => {
         return forecastEq.slice(firstIndex, lastIndex)
     }, [currentPage, forecastEq])
 
-// Last Month
+    // Last Month
     const lastItem = useMemo(() => {
         return equation[equation.length - 1]
     }, [equation])
@@ -197,6 +104,112 @@ const Forecasting: React.FC = () => {
             ]
         }))
     }, [equation]);
+
+    useMemo(() => {
+        let data: number[] = []
+        for (let i = 1; i <= equation.length; i++) {
+            data.push(i)
+        }
+        setJumlahData(data)
+    }, [equation.length]);
+
+    const maxEquation = genapkanKeSeribuan(Math.max(...equation.map(item => item.forecast)))
+
+    const options: ApexOptions = {
+        legend: {
+            show: false,
+            position: "top",
+            horizontalAlign: "left",
+        },
+        colors: ["#3C50E0", "#80CAEE"],
+        chart: {
+            height: 335,
+            type: "area",
+            dropShadow: {
+                enabled: true,
+                color: "#623CEA14",
+                top: 10,
+                blur: 4,
+                left: 0,
+                opacity: 0.1,
+            },
+
+            toolbar: {
+                show: false,
+            },
+        },
+        responsive: [
+            {
+                breakpoint: 1024,
+                options: {
+                    chart: {
+                        height: 300,
+                    },
+                },
+            },
+            {
+                breakpoint: 1366,
+                options: {
+                    chart: {
+                        height: 350,
+                    },
+                },
+            },
+        ],
+        stroke: {
+            width: [2, 2],
+            curve: "straight",
+        },
+
+        grid: {
+            xaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+            yaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        markers: {
+            size: 4,
+            colors: "#fff",
+            strokeColors: ["#3056D3", "#80CAEE"],
+            strokeWidth: 3,
+            strokeOpacity: 0.9,
+            strokeDashArray: 0,
+            fillOpacity: 1,
+            discrete: [],
+            hover: {
+                size: undefined,
+                sizeOffset: 5,
+            },
+        },
+        xaxis: {
+            type: "category",
+            categories: jumlahData,
+            axisBorder: {
+                show: false,
+            },
+            axisTicks: {
+                show: false,
+            },
+        },
+        yaxis: {
+            title: {
+                style: {
+                    fontSize: "0px",
+                },
+            },
+            min: 0,
+            max: maxEquation + 2000,
+        },
+    }
 
     // Handling Pagination
     const handlePagination = (page: number) => {
@@ -418,7 +431,7 @@ const Forecasting: React.FC = () => {
                                     {lastItem && (
                                         <p
                                             className="text-sm font-medium">
-                                            Forecasting pada Bulan 1 - {lastItem.month}</p>
+                                            Forecasting pada Bulan 1 - {equation.length}</p>
                                     )}
                                 </div>
                             </div>

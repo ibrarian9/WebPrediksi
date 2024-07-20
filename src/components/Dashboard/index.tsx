@@ -4,104 +4,11 @@ import {ChartBarIcon, UserCircleIcon, ChartPieIcon} from "@heroicons/react/24/ou
 import useStoreItem from "@/app/stores/useStoreItem";
 import ReactApexChart from "react-apexcharts";
 import {ApexOptions} from "apexcharts";
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import Cookies from "js-cookie";
 
-const options: ApexOptions = {
-    legend: {
-        show: false,
-        position: "top",
-        horizontalAlign: "left",
-    },
-    colors: ["#3C50E0", "#80CAEE"],
-    chart: {
-        height: 335,
-        type: "area",
-        dropShadow: {
-            enabled: true,
-            color: "#623CEA14",
-            top: 10,
-            blur: 4,
-            left: 0,
-            opacity: 0.1,
-        },
-
-        toolbar: {
-            show: false,
-        },
-    },
-    responsive: [
-        {
-            breakpoint: 1024,
-            options: {
-                chart: {
-                    height: 300,
-                },
-            },
-        },
-        {
-            breakpoint: 1366,
-            options: {
-                chart: {
-                    height: 350,
-                },
-            },
-        },
-    ],
-    stroke: {
-        width: [2, 2],
-        curve: "straight",
-    },
-    grid: {
-        xaxis: {
-            lines: {
-                show: true,
-            },
-        },
-        yaxis: {
-            lines: {
-                show: true,
-            },
-        },
-    },
-    dataLabels: {
-        enabled: false,
-    },
-    markers: {
-        size: 4,
-        colors: "#fff",
-        strokeColors: ["#3056D3", "#80CAEE"],
-        strokeWidth: 3,
-        strokeOpacity: 0.9,
-        strokeDashArray: 0,
-        fillOpacity: 1,
-        discrete: [],
-        hover: {
-            size: undefined,
-            sizeOffset: 5,
-        },
-    },
-    xaxis: {
-        type: "category",
-        categories: [
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-        ],
-        axisBorder: {
-            show: false,
-        },
-        axisTicks: {
-            show: false,
-        },
-    },
-    yaxis: {
-        title: {
-            style: {
-                fontSize: "0px",
-            },
-        },
-        min: 0,
-        max: 100000,
-    },
+function genapkanKeSeribuan(num: number): number {
+    return Math.ceil(num / 1000) * 1000
 }
 
 interface ChartOneState {
@@ -117,6 +24,112 @@ const Dashboard: React.FC = () => {
     const jumlahDataAktual = Cookies.get("jumlahData")
     const jumlahDataProduct = Cookies.get("products")
     const {items} = useStoreItem()
+    const [jumlahData, setJumlahData] = useState<number[]>([])
+
+    useMemo(() => {
+        let data: number[] = []
+        for (let i = 1; i <= items.length; i++) {
+            data.push(i)
+        }
+        setJumlahData(data)
+    }, [items.length]);
+
+    const maxData = genapkanKeSeribuan(Math.max(...items))
+
+    const options: ApexOptions = {
+        legend: {
+            show: false,
+            position: "top",
+            horizontalAlign: "left",
+        },
+        colors: ["#3C50E0", "#80CAEE"],
+        chart: {
+            height: 335,
+            type: "area",
+            dropShadow: {
+                enabled: true,
+                color: "#623CEA14",
+                top: 10,
+                blur: 4,
+                left: 0,
+                opacity: 0.1,
+            },
+
+            toolbar: {
+                show: false,
+            },
+        },
+        responsive: [
+            {
+                breakpoint: 1024,
+                options: {
+                    chart: {
+                        height: 300,
+                    },
+                },
+            },
+            {
+                breakpoint: 1366,
+                options: {
+                    chart: {
+                        height: 350,
+                    },
+                },
+            },
+        ],
+        stroke: {
+            width: [2, 2],
+            curve: "straight",
+        },
+        grid: {
+            xaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+            yaxis: {
+                lines: {
+                    show: true,
+                },
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        markers: {
+            size: 4,
+            colors: "#fff",
+            strokeColors: ["#3056D3", "#80CAEE"],
+            strokeWidth: 3,
+            strokeOpacity: 0.9,
+            strokeDashArray: 0,
+            fillOpacity: 1,
+            discrete: [],
+            hover: {
+                size: undefined,
+                sizeOffset: 5,
+            },
+        },
+        xaxis: {
+            type: "category",
+            categories: jumlahData,
+            axisBorder: {
+                show: false,
+            },
+            axisTicks: {
+                show: false,
+            },
+        },
+        yaxis: {
+            title: {
+                style: {
+                    fontSize: "0px",
+                },
+            },
+            min: 0,
+            max: maxData + 1000,
+        },
+    }
 
     const [state, setState] = useState<ChartOneState>({
         series: [
