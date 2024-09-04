@@ -26,6 +26,12 @@ interface Forecastings {
     tf: number
 }
 
+interface Equation {
+    id: number;
+    month: number;
+    forecast: number;
+}
+
 export default function RootLayout({children,}: Readonly<{
     children: React.ReactNode;
 }>) {
@@ -75,23 +81,36 @@ export default function RootLayout({children,}: Readonly<{
 
         const {lamda, lamda2} = rumus
 
-        const initialLf = products[0].production;
-        const initialTf = initialLf
+        const Formula: Forecastings[] = []
 
-        const Formula: Forecastings[] = [
-            {
-                id: products[0].id,
-                date: products[0].date,
-                production: products[0].production,
-                lf: initialLf,
-                tf: initialTf
-            }
-        ]
+        let lf = 0;
+        let tf = 0;
 
-        let lf = initialLf;
-        let tf = initialTf;
+        Formula.push({
+            id: products[0].id,
+            date: products[0].date,
+            production: products[0].production,
+            lf: lf,
+            tf: tf,
+        })
 
-        for (let i = 1; i < products.length; i++) {
+        if (products.length > 1) {
+            const lf2 = products[1].production
+            const tf2 = products[0].production - lf2
+
+            Formula.push({
+                id: products[1].id,
+                date: products[1].date,
+                production: products[1].production,
+                lf: lf2,
+                tf: tf2,
+            })
+
+            lf = lf2
+            tf = tf2
+        }
+
+        for (let i = 2; i < products.length; i++) {
             const {id, production, date} = products[i];
             const newLf = lamda * production + (1 - lamda) * (lf + tf);
             const newTf = lamda2 * (newLf - lf) + (1 - lamda2) * tf;
@@ -107,14 +126,20 @@ export default function RootLayout({children,}: Readonly<{
     }, [products, rumus])
 
     useMemo(() => {
-        if (month.length === 0 || formula.length === 0) return []
+        if (formula.length === 0) return []
 
-        const lastForecast = formula[formula.length - 1]
-        const data = month.map((item) => ({
-            id: item.id,
-            month: item.month,
-            forecast: lastForecast.lf + (item.month * lastForecast?.tf),
-        }))
+        const data: Equation[] = []
+
+        for (let i = 0; i < formula.length - 1; i++) {
+            const lastForecast = formula[i + 1]
+            const forecast = lastForecast?.lf + lastForecast?.tf
+
+            data.push({
+                id: i + 1,
+                month: i + 1,
+                forecast: forecast,
+            })
+        }
 
         setEquation(data)
         return data
