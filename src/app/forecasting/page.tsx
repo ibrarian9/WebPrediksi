@@ -93,8 +93,6 @@ const Forecasting: React.FC = () => {
         return mergeData.slice(firstIndex, lastIndex)
     }, [currentPage, mergeData])
 
-    console.table(mergedData)
-
     // Last Month
     const lastItem = useMemo(() => {
         return equation[equation.length - 1]
