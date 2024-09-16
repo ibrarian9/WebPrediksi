@@ -75,7 +75,7 @@ const Forecasting: React.FC = () => {
     const mergeData: MergeData[] = forecastEq.map((item, id): MergeData => {
         const coreIndex = id - 2
         const monthIndex = id + 1
-        const coreEquation = equation.find((d, index) => index === coreIndex)
+        const coreEquation = equation.find((_d, index) => index === coreIndex)
 
         return coreEquation ?
             {...item, ...coreEquation, month: monthIndex} :
