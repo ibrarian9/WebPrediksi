@@ -9,6 +9,7 @@ import forecastAllData from "@/app/lib/forecastAllData";
 import useForecastItem from "@/app/stores/useForecastItem";
 import rumusData from "@/app/lib/rumusData";
 import monthData from "@/app/lib/monthData";
+import getAllForecast from "@/app/lib/jumlahForecast";
 
 interface Forecast {
     id: number;
@@ -24,6 +25,8 @@ interface Forecastings {
     production: number;
     lf: number;
     tf: number
+    t: number
+    b: number
 }
 
 interface Equation {
@@ -37,17 +40,29 @@ export default function RootLayout({children,}: Readonly<{
 }>) {
 
     const {setForecast, setItem, setData, data} = useStoreItem()
-    const {setProducts, products, setForecastEq, setEquation, setMonth, month, rumus, setRumus} = useForecastItem()
+    const {
+        setProducts,
+        products,
+        setForecastEq,
+        setEquation,
+        setMonth,
+        month,
+        rumus,
+        setRumus,
+        totalForecast,
+        setTotalForecast
+    } = useForecastItem()
     const [loading, setLoading] = useState<boolean>(true)
 
     useEffect(() => {
         setTimeout(() => setLoading(false), 1000);
-        Promise.all([dataActual(), forecastAllData(), rumusData(), monthData()])
-            .then(([dataResult, productResult, rumusResult, monthResult]) => {
+        Promise.all([dataActual(), forecastAllData(), rumusData(), monthData(), getAllForecast()])
+            .then(([dataResult, productResult, rumusResult, monthResult, jumlahResult]) => {
                 setData(dataResult.data);
                 setProducts(productResult.data);
                 setRumus(rumusResult.data);
                 setMonth(monthResult.data);
+                setTotalForecast(jumlahResult.data)
             })
     }, []);
 
@@ -83,60 +98,57 @@ export default function RootLayout({children,}: Readonly<{
 
         const Formula: Forecastings[] = []
 
-        let lf = 0;
-        let tf = 0;
+        let initLf = products[0].production;
+        let initTf = products[0].production;
+        let initT = products[0].production;
+        let initB = 0;
 
         Formula.push({
             id: products[0].id,
             date: products[0].date,
             production: products[0].production,
-            lf: lf,
-            tf: tf,
+            lf: initLf,
+            tf: initTf,
+            t: initT,
+            b: initB
         })
 
-        if (products.length > 1) {
-            const lf2 = products[1].production
-            const tf2 = products[0].production - lf2
+        const panjangData = products.length + totalForecast.jumlahForecast
 
-            Formula.push({
-                id: products[1].id,
-                date: products[1].date,
-                production: products[1].production,
-                lf: lf2,
-                tf: tf2,
-            })
+        for (let i = 2; i < panjangData; i++) {
+            const {id, date} = products[i] ?? 0;
+            const production = products[i - 1]?.production ?? 0;
+            const newLf = (lamda * production) + (lamda2 * initLf);
+            const newTf = (lamda * newLf) + (lamda2 * initT);
+            const newT = (2 * newLf) - newTf
+            const newB = (lamda / lamda2) * (newTf - newT)
 
-            lf = lf2
-            tf = tf2
-        }
+            initLf = newLf;
+            initTf = newTf;
+            initT = newT
+            initB = newB
 
-        for (let i = 2; i < products.length; i++) {
-            const {id, production, date} = products[i];
-            const newLf = lamda * production + (1 - lamda) * (lf + tf);
-            const newTf = lamda2 * (newLf - lf) + (1 - lamda2) * tf;
-
-            lf = newLf;
-            tf = newTf;
-
-            Formula.push({id, date, production, lf, tf});
+            Formula.push({id: id, date: date, production: production, lf: initLf, tf: initTf, t: initT, b: initB});
         }
 
         setForecastEq(Formula)
         return Formula
-    }, [products, rumus])
+    }, [products, rumus, totalForecast.jumlahForecast])
 
     useMemo(() => {
         if (formula.length === 0) return []
 
         const data: Equation[] = []
 
-        for (let i = 0; i < formula.length - 1; i++) {
-            const lastForecast = formula[i + 1]
-            const forecast = lastForecast?.lf + lastForecast?.tf
+        let mountCount = 1
+
+        for (let i = products.length; i < formula.length; i++) {
+            const lastForecast = formula[i]
+            const forecast = lastForecast?.t + lastForecast?.b
 
             data.push({
                 id: i + 1,
-                month: i + 1,
+                month: mountCount++,
                 forecast: forecast,
             })
         }

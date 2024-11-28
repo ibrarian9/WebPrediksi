@@ -1,14 +1,14 @@
 "use client"
 
-import {ChartBarIcon, UserCircleIcon, ChartPieIcon} from "@heroicons/react/24/outline";
-import useStoreItem from "@/app/stores/useStoreItem";
+import {ChartBarIcon, ChartPieIcon, UserCircleIcon} from "@heroicons/react/24/outline";
 import ReactApexChart from "react-apexcharts";
 import {ApexOptions} from "apexcharts";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import Cookies from "js-cookie";
+import useForecastItem from "@/app/stores/useForecastItem";
 
 function genapkanKeSeribuan(num: number): number {
-    return Math.ceil(num / 1000) * 1000
+    return Math.ceil(num / 100) * 100
 }
 
 interface ChartOneState {
@@ -22,19 +22,19 @@ const Dashboard: React.FC = () => {
 
     const jumlahUsers = Cookies.get("jumlahUser")
     const jumlahDataAktual = Cookies.get("jumlahData")
-    const jumlahDataProduct = Cookies.get("products")
-    const {items} = useStoreItem()
+    const {products, totalForecast} = useForecastItem()
     const [jumlahData, setJumlahData] = useState<number[]>([])
 
-    useMemo(() => {
+    useEffect(() => {
         let data: number[] = []
-        for (let i = 1; i <= items.length; i++) {
+        for (let i = 1; i <= products.length; i++) {
             data.push(i)
         }
         setJumlahData(data)
-    }, [items.length]);
+    }, [products.length]);
 
-    const maxData = genapkanKeSeribuan(Math.max(...items))
+    const minData = genapkanKeSeribuan(Math.min(...jumlahData))
+    const maxData = genapkanKeSeribuan(Math.max(...jumlahData))
 
     const options: ApexOptions = {
         legend: {
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
                 },
             },
             min: 0,
-            max: maxData + 1000,
+            max: maxData,
         },
     }
 
@@ -135,17 +135,23 @@ const Dashboard: React.FC = () => {
         series: [
             {
                 name: "Data Actual Forecast",
-                data: items,
+                data: [],
             },
         ],
     });
 
-    const handleReset = () => {
-        setState((prevState) => ({
-            ...prevState,
-        }));
-    };
-    handleReset;
+    useEffect(() => {
+        const dataForecast = products.map((item) => item.production);
+        setState({
+            series: [
+                {
+                    name: "Data Actual Forecast",
+                    data: dataForecast,
+                },
+            ],
+        });
+    }, [products]);
+
 
     return (
         <>
@@ -154,7 +160,7 @@ const Dashboard: React.FC = () => {
                 border-stroke shadow-default dark:border-strokedark dark:bg-boxdark">
                     <ChartBarIcon className="size-16 border-2 border-black bg-green-500 text-black-2"/>
                     <div className="flex-col py-2 px-4">
-                        <h1 className="">Data Actual</h1>
+                        <h1 className="">Data Production</h1>
                         <h5 className="">{jumlahDataAktual}</h5>
                     </div>
                 </div>
@@ -170,8 +176,8 @@ const Dashboard: React.FC = () => {
                 border-stroke shadow-default dark:border-strokedark dark:bg-boxdark">
                     <ChartPieIcon className="size-16 border-2 bg-yellow-500 text-black-2"/>
                     <div className="flex-col py-2 px-4">
-                        <h1 className="">Production</h1>
-                        <h5 className="">{jumlahDataProduct}</h5>
+                        <h1 className="">Total Forecast</h1>
+                        <h5 className="">{totalForecast.jumlahForecast}</h5>
                     </div>
                 </div>
             </div>

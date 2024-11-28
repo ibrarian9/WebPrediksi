@@ -4,12 +4,11 @@ import React, {useEffect, useRef, useState} from "react";
 import {usePathname} from "next/navigation";
 import Link from "next/link";
 import {
-    Squares2X2Icon,
-    TableCellsIcon,
+    ArrowLeftIcon,
     DocumentTextIcon,
-    UsersIcon,
     ExclamationCircleIcon,
-    ArrowLeftIcon
+    Squares2X2Icon,
+    UsersIcon
 } from "@heroicons/react/24/outline";
 
 interface SidebarProps {
@@ -26,7 +25,7 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
     let storedSidebarExpanded = "true";
 
     const [sidebarExpanded, setSidebarExpanded] = useState(
-        storedSidebarExpanded === null ? false : storedSidebarExpanded === "true",
+        storedSidebarExpanded === "true",
     );
 
     // close on click outside
@@ -115,17 +114,17 @@ const Sidebar = ({sidebarOpen, setSidebarOpen}: SidebarProps) => {
                             {/* <!-- Menu Item Dashboard --> */}
 
                             {/* <!-- Menu Item Data Aktual --> */}
-                            <li>
-                                <Link
-                                    href={"/data"}
-                                    className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                                        pathname.includes("data") && "bg-graydark dark:bg-meta-4"
-                                    }`}
-                                >
-                                    <TableCellsIcon className="size-[20px]"/>
-                                    Data Aktual
-                                </Link>
-                            </li>
+                            {/*<li>*/}
+                            {/*    <Link*/}
+                            {/*        href={"/data"}*/}
+                            {/*        className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${*/}
+                            {/*            pathname.includes("data") && "bg-graydark dark:bg-meta-4"*/}
+                            {/*        }`}*/}
+                            {/*    >*/}
+                            {/*        <TableCellsIcon className="size-[20px]"/>*/}
+                            {/*        Data Aktual*/}
+                            {/*    </Link>*/}
+                            {/*</li>*/}
                             {/* <!-- Menu Item Data Aktual --> */}
 
                             {/* <!-- Menu Item Forecasting --> */}

@@ -6,47 +6,25 @@ import Link from "next/link";
 import {useEffect, useState} from "react";
 import Swal from "sweetalert2";
 import {useRouter} from "next/navigation";
-import RumusData from "@/app/lib/rumusData";
-import useForecastItem from "@/app/stores/useForecastItem";
 import forecastAllData from "@/app/lib/forecastAllData";
+import totalForecast from "@/app/lib/jumlahForecast"
+import setJumlahForecast from "@/app/lib/setJumlahForecast";
+import useForecastItem from "@/app/stores/useForecastItem";
 
-
-export async function EditRumus(formData: any) {
-
-    const response = await fetch(`${process.env.API_URL}/forecast/rumus/1`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-    })
-
-    return await response.json()
-}
-
-export async function rumusData() {
-
-    const response = await fetch(`${process.env.API_URL}/forecast/rumus/1`)
-
-    return await response.json()
-}
-
-const Rumus = () => {
+const JumlahForecast = () => {
 
     const router = useRouter()
-    const {setRumus, setProducts} = useForecastItem()
-    const [formData, setForm] = useState({
-        lamda: 0,
-        lamda2: 0
+    const {setProducts, setTotalForecast} = useForecastItem()
+    const [formData, setFormData] = useState({
+        jumlahForecast: 0
     })
 
     useEffect(() => {
         const fetchRumus = async () => {
-            const result = await rumusData()
+            const result = await totalForecast()
             if (result.httpStatus === 200) {
-                setForm({
-                    lamda: result.data.lamda,
-                    lamda2: result.data.lamda2
+                setFormData({
+                    jumlahForecast: result.data.jumlahForecast
                 })
             }
         }
@@ -55,7 +33,7 @@ const Rumus = () => {
 
 
     const handleChange = (e: any) => {
-        setForm({
+        setFormData({
             ...formData,
             [e.target.name]: e.target.value
         })
@@ -64,26 +42,26 @@ const Rumus = () => {
     const handleUpdate = async (e: any) => {
         e.preventDefault()
 
-        const result = await EditRumus(formData)
+        const result = await setJumlahForecast(formData)
         if (result.httpStatus === 200) {
             await Swal.fire({
                 position: "center",
                 icon: "success",
                 title: "Berhasil",
-                text: "Rumus Berhasil Diubah",
+                text: " Jumlah Forecast Berhasil Diubah",
                 showConfirmButton: true
             })
             const newProduct = await forecastAllData()
             setProducts(newProduct.data)
-            const newData = await RumusData()
-            setRumus(newData.data)
+            const newData = await totalForecast()
+            setTotalForecast(newData.data)
             router.push("/forecasting")
         } else {
             await Swal.fire({
                 position: "center",
                 icon: "error",
                 title: "Gagal",
-                text: "Rumus Gagal Diubah",
+                text: "Jumlah Forecast Gagal Diubah",
                 showConfirmButton: true
             })
         }
@@ -92,7 +70,7 @@ const Rumus = () => {
     return (
         <>
             <DefaultLayout>
-                <Breadcrumb pageName={"Edit Rumus"}/>
+                <Breadcrumb pageName={"Jumlah Forecast"}/>
                 <div className="overflow-hidden bg-white min-h-screen rounded-sm border flex justify-center
                 border-stroke shadow-default dark:border-strokedark dark:bg-boxdark">
                     <div className={"w-4/5 h-fit"}>
@@ -104,24 +82,13 @@ const Rumus = () => {
                         </div>
                         <form onSubmit={handleUpdate}>
                             <div className="py-2.5">
-                                <h5 className={"text-black-2 font-extrabold"}>ALPHA</h5>
+                                <h5 className={"text-black-2 font-extrabold"}>Jumlah Forecast</h5>
                                 <input className={"w-full border-2 border-black p-2 rounded-md hover:border-blue-500"}
-                                       name={"lamda"}
+                                       name={"jumlahForecast"}
                                        type={"number"}
-                                       step={"0.01"}
-                                       value={formData.lamda}
+                                       value={formData.jumlahForecast}
                                        onChange={handleChange}
-                                       placeholder={"Masukkan Alpha"} required={true}/>
-                            </div>
-                            <div className="py-2.5">
-                                <h5 className={"text-black-2 font-extrabold"}>BETA (1-ALPHA)</h5>
-                                <input className={"w-full border-2 border-black p-2 rounded-md hover:border-blue-500"}
-                                       name={"lamda2"}
-                                       type={"number"}
-                                       step={"0.01"}
-                                       value={formData.lamda2}
-                                       onChange={handleChange}
-                                       placeholder={"Masukkan Beta"} required={true}/>
+                                       placeholder={"Masukkan Jumlah Forecast"} required={true}/>
                             </div>
                             <div className={"flex justify-start py-2.5"}>
                                 <button
@@ -138,4 +105,4 @@ const Rumus = () => {
     )
 }
 
-export default Rumus
+export default JumlahForecast

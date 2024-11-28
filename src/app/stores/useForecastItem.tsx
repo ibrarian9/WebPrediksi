@@ -12,6 +12,8 @@ interface Forecastings {
     production: number;
     lf: number;
     tf: number
+    t: number
+    b: number
 }
 
 interface ForecastingEquation {
@@ -30,7 +32,13 @@ interface Rumus {
     lamda2: number;
 }
 
+interface TotalForecast {
+    jumlahForecast: number;
+}
+
 interface storeItem {
+    totalForecast: TotalForecast
+    setTotalForecast: (totalForecast: TotalForecast) => void;
     products: Product[];
     setProducts: (products: Product[]) => void;
     forecastEq: Forecastings[];
@@ -44,11 +52,13 @@ interface storeItem {
 }
 
 const useForecastItem = create<storeItem>((set) => ({
+    totalForecast: {jumlahForecast: 0},
     products: [],
     forecastEq: [],
     equation: [],
     month: [],
     rumus: {lamda: 0, lamda2: 0},
+    setTotalForecast: totalForecast => set({totalForecast}),
     setRumus: rumus => set({rumus}),
     setProducts: products => set(() => ({products})),
     setForecastEq: forecastEq => set(() => ({forecastEq})),

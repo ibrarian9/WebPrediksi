@@ -19,18 +19,8 @@ interface Chart {
     }[]
 }
 
-interface MergeData {
-    id: number,
-    date: string,
-    production: number,
-    lf: number,
-    tf: number,
-    month: number,
-    forecast: number
-}
-
 function genapkanKeSeribuan(num: number): number {
-    return Math.ceil(num / 1000) * 1000
+    return Math.ceil(num / 10) * 10
 }
 
 export async function deleteProduct(id: number) {
@@ -47,6 +37,7 @@ const Forecasting: React.FC = () => {
     const itemPerPage: number = 5
     const {forecastEq, equation, setProducts} = useForecastItem()
     const [currentPage, setCurrentPage] = useState<number>(1)
+    const [currentPageForecast, setCurrentPageForecast] = useState<number>(1)
     const [jumlahData, setJumlahData] = useState<number[]>([])
     const [state, setState] = useState<Chart>({
         series: [
@@ -63,43 +54,44 @@ const Forecasting: React.FC = () => {
     }, 0)
 
     // Total Forecast
-    const sumEquation = equation.reduce((sum, equation) => {
+    equation.reduce((sum, equation) => {
         return sum + equation.forecast
-    }, 0)
+    }, 0);
 
-    // EUR
-    const Eur = sumForecast + sumEquation
-    // RR
-    const RR = Eur - sumForecast
-
-    const mergeData: MergeData[] = forecastEq.map((item, id): MergeData => {
-        const coreIndex = id - 2
-        const monthIndex = id + 1
-        const coreEquation = equation.find((_d, index) => index === coreIndex)
-
-        return coreEquation ?
-            {...item, ...coreEquation, month: monthIndex} :
-            {...item, month: monthIndex} as MergeData
-    })
-
-    // Pagination
+// Pagination
     const totalPages = useMemo(() => Math.ceil(forecastEq.length / itemPerPage)
         , [forecastEq])
 
-    // Merged Data after Pagination
-    const mergedData: MergeData[] = useMemo(() => {
+    // Forecast Data after Pagination
+    const forecastData = useMemo(() => {
         const lastIndex = currentPage * itemPerPage
         const firstIndex = lastIndex - itemPerPage
-        return mergeData.slice(firstIndex, lastIndex)
-    }, [currentPage, mergeData])
+        return forecastEq.slice(firstIndex, lastIndex)
+    }, [currentPage, forecastEq])
 
     // Last Month
     const lastItem = useMemo(() => {
         return equation[equation.length - 1]
     }, [equation])
 
+    const equationData = useMemo(() => {
+        const lastIndex = currentPageForecast * itemPerPage
+        const firstIndex = lastIndex - itemPerPage
+        return equation.slice(firstIndex, lastIndex)
+    }, [currentPageForecast, equation])
+
+    const totalNpLimit = useMemo(() => {
+        const filteredData = equation.filter(row => row.forecast >= 5);
+        return filteredData.reduce((sum, row) => sum + parseFloat(String(row.forecast)), 0);
+    }, [equation]);
+
+    // EUR
+    const Eur = sumForecast + totalNpLimit
+    // RR
+    const RR = Eur - totalNpLimit
+
     // pagination
-    useMemo(() => Math.ceil(equation.length / itemPerPage)
+    const totalPageForecast = useMemo(() => Math.ceil(equation.length / itemPerPage)
         , [equation]);
 
     useEffect(() => {
@@ -217,14 +209,18 @@ const Forecasting: React.FC = () => {
                     fontSize: "0px",
                 },
             },
-            min: minEquation - 2000,
-            max: maxEquation + 2000,
+            min: minEquation - 10,
+            max: maxEquation + 10,
         },
     }
 
     // Handling Pagination
     const handlePagination = (page: number) => {
         setCurrentPage(page)
+    }
+
+    const handlePageForecast = (page: number) => {
+        setCurrentPageForecast(page)
     }
 
     // Delete Product
@@ -267,7 +263,7 @@ const Forecasting: React.FC = () => {
         setState((prevState) => ({
             ...prevState,
         }));
-    };
+    }
     handleReset;
 
     return (
@@ -289,22 +285,25 @@ const Forecasting: React.FC = () => {
                             <thead>
                             <tr className="bg-gray-2 text-center dark:bg-meta-4">
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Date
+                                    Waktu
                                 </th>
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Production
+                                    Laju Produksi
                                 </th>
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Level Formula
+                                    Bulan
                                 </th>
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Trend Formula
+                                    S'T
                                 </th>
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Month
+                                    S''T
                                 </th>
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Forecast
+                                    T
+                                </th>
+                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
+                                    B
                                 </th>
                                 <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
                                     Actions
@@ -312,14 +311,15 @@ const Forecasting: React.FC = () => {
                             </tr>
                             </thead>
                             <tbody>
-                            {mergedData.map((item, key) => (
+                            {forecastData.map((item, key) => (
                                 <tr key={key} className={"border-2"}>
                                     <td className={"border-2 p-2"}>{item?.date}</td>
                                     <td className={"border-2 p-2"}>{parseFloat(item.production?.toFixed(3))}</td>
-                                    <td className={"border-2 p-2"}>{parseFloat(item.lf?.toFixed(3))}</td>
-                                    <td className={"border-2 p-2"}>{parseFloat(item.tf?.toFixed(3))}</td>
-                                    <td className={"border-2 p-2"}>{item?.month}</td>
-                                    <td className={"border-2 p-2"}>{item?.forecast !== undefined && item?.forecast !== null ? parseFloat(item.forecast.toFixed(3)) : 0}</td>
+                                    <td className={"border-2 p-2"}>{key + 1}</td>
+                                    <td className={"border-2 p-2"}>{item.lf}</td>
+                                    <td className={"border-2 p-2"}>{item.tf}</td>
+                                    <td className={"border-2 p-2"}>{item.t}</td>
+                                    <td className={"border-2 p-2"}>{item.b}</td>
                                     <td className={"border-2 p-2 text-center"}>
                                         <button>
                                             <Link className="hover:text-green-500"
@@ -342,6 +342,45 @@ const Forecasting: React.FC = () => {
                                 initialPage={1}
                                 onChange={handlePagination}
                                 page={currentPage}
+                                variant={"bordered"}/>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="overflow-hidden bg-white h-fit rounded-sm border
+                border-stroke shadow-default dark:border-strokedark dark:bg-boxdark py-10 mt-5">
+                    <div className={"flex justify-between mx-20 mb-5"}>
+                        <Link className={"py-2 px-3 bg-blue-700 text-white rounded-xl"} href={"/forecasting/forecast"}>
+                            Jumlah Forecast
+                        </Link>
+                    </div>
+                    <div className={"mx-20"}>
+                        <table className={"w-full table-auto"}>
+                            <thead>
+                            <tr className="bg-gray-2 text-center dark:bg-meta-4">
+                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
+                                    Bulan
+                                </th>
+                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
+                                    Forecast
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {equationData.map((item, key) => (
+                                <tr key={key} className={"border-2"}>
+                                    <td className={"border-2 p-2"}>{item?.month}</td>
+                                    <td className={"border-2 p-2"}>{item?.forecast}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                        <div className={"flex flex-wrap gap-4 items-center py-4"}>
+                            <Pagination
+                                total={totalPageForecast}
+                                initialPage={1}
+                                onChange={handlePageForecast}
+                                page={currentPageForecast}
                                 variant={"bordered"}/>
                         </div>
                     </div>
@@ -383,7 +422,7 @@ const Forecasting: React.FC = () => {
                                      </span>
                                     <div className="flex-col">
                                         <p className="font-semibold text-primary">Np Limit</p>
-                                        <p className="font-sm font-medium">{parseFloat(sumEquation.toFixed(3))}</p>
+                                        <p className="font-sm font-medium">{totalNpLimit}</p>
                                     </div>
                                 </div>
                                 <div className="flex w-56">
