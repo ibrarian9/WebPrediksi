@@ -1,7 +1,6 @@
 "use client"
 
 import {PencilSquareIcon, TrashIcon} from "@heroicons/react/24/outline";
-import {Pagination} from "@nextui-org/pagination";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
@@ -58,7 +57,7 @@ const Forecasting: React.FC = () => {
         return sum + equation.forecast
     }, 0);
 
-// Pagination
+    // Pagination
     const totalPages = useMemo(() => Math.ceil(forecastEq.length / itemPerPage)
         , [forecastEq])
 
@@ -270,79 +269,92 @@ const Forecasting: React.FC = () => {
         <>
             <DefaultLayout>
                 <Breadcrumb pageName="Forecasting"/>
-                <div className="overflow-hidden bg-white h-fit rounded-sm border
-                border-stroke shadow-default dark:border-strokedark dark:bg-boxdark py-10">
-                    <div className={"flex justify-between mx-20 mb-5"}>
-                        <Link className={"py-2 px-3 bg-blue-700 text-white rounded-xl"} href={"/forecasting/rumus"}>
+                <div
+                    className="bg-white rounded-sm border border-stroke shadow-md dark:border-strokedark dark:bg-boxdark p-6">
+                    {/* Header Buttons */}
+                    <div className="flex justify-between mx-4 mb-4">
+                        <Link
+                            className="py-2 px-3 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+                            href="/forecasting/rumus"
+                        >
                             Edit Rumus
                         </Link>
-                        <Link className={"py-2 px-3 bg-blue-700 text-white rounded-xl"} href={"/forecasting/tambah"}>
+                        <Link
+                            className="py-2 px-3 bg-blue-700 text-white rounded-lg hover:bg-blue-600"
+                            href="/forecasting/tambah"
+                        >
                             Tambah Data
                         </Link>
                     </div>
-                    <div className={"mx-20"}>
-                        <table className={"w-full table-auto"}>
+
+                    {/* Table */}
+                    <div className="mx-4">
+                        <table className="w-full border-collapse">
                             <thead>
-                            <tr className="bg-gray-2 text-center dark:bg-meta-4">
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Waktu
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Laju Produksi
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Bulan
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    S'T
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    S''T
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    T
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    B
-                                </th>
-                                <th className="px-4 py-4 font-medium text-black dark:text-white border-2">
-                                    Actions
-                                </th>
+                            <tr className="bg-gray-200 text-center dark:bg-gray-700 border-2">
+                                {["Waktu", "Laju Produksi", "Bulan", "S'T", "S''T", "T", "B", "Actions"].map((header) => (
+                                    <th
+                                        key={header}
+                                        className="px-4 py-2 border font-medium text-black dark:text-white"
+                                    >
+                                        {header}
+                                    </th>
+                                ))}
                             </tr>
                             </thead>
                             <tbody>
-                            {forecastData.map((item, key) => (
-                                <tr key={key} className={"border-2"}>
-                                    <td className={"border-2 p-2"}>{item?.date}</td>
-                                    <td className={"border-2 p-2"}>{parseFloat(item.production?.toFixed(3))}</td>
-                                    <td className={"border-2 p-2"}>{key + 1}</td>
-                                    <td className={"border-2 p-2"}>{item.lf}</td>
-                                    <td className={"border-2 p-2"}>{item.tf}</td>
-                                    <td className={"border-2 p-2"}>{item.t}</td>
-                                    <td className={"border-2 p-2"}>{item.b}</td>
-                                    <td className={"border-2 p-2 text-center"}>
-                                        <button>
-                                            <Link className="hover:text-green-500"
-                                                  href={`/forecasting/edit/${item.id}`}>
-                                                <PencilSquareIcon className={"size-[20px]"}/>
-                                            </Link>
-                                        </button>
-                                        <button className="hover:text-danger mx-2"
-                                                onClick={() => deleteHandle(item.id)}>
-                                            <TrashIcon className={"size-[20px]"}/>
-                                        </button>
+                            {forecastData.length === 0 ? (
+                                <tr>
+                                    <td colSpan={8} className="p-4 text-center text-gray-500 border-2">
+                                        No data available
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                forecastData.map((item, index) => (
+                                    <tr key={item.id} className="text-center border dark:border-gray-600">
+                                        <td className=" border-2 p-2">{item.date}</td>
+                                        <td className=" border-2 p-2">{parseFloat(item.production?.toFixed(3))}</td>
+                                        <td className=" border-2 p-2">{index + 1}</td>
+                                        <td className=" border-2 p-2">{Number(item.lf.toPrecision(5))}</td>
+                                        <td className=" border-2 p-2">{Number(item.tf.toPrecision(5))}</td>
+                                        <td className=" border-2 p-2">{Number(item.t.toPrecision(5))}</td>
+                                        <td className=" border-2 p-2">{Number(item.b.toPrecision(5))}</td>
+                                        <td className="p-2 flex justify-center space-x-2">
+                                            <Link
+                                                className="hover:text-green-500"
+                                                href={`/forecasting/edit/${item.id}`}
+                                            >
+                                                <PencilSquareIcon className="w-5 h-5 inline"/>
+                                            </Link>
+                                            <button
+                                                className="hover:text-red-500 ml-2"
+                                                onClick={() => deleteHandle(item.id)}
+                                            >
+                                                <TrashIcon className="w-5 h-5 inline"/>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                             </tbody>
                         </table>
-                        <div className={"flex flex-wrap gap-4 items-center py-4"}>
-                            <Pagination
-                                total={totalPages}
-                                initialPage={1}
-                                onChange={handlePagination}
-                                page={currentPage}
-                                variant={"bordered"}/>
+
+                        {/* Pagination */}
+                        <div className="flex justify-center mt-4">
+                            <div className="flex space-x-1">
+                                {[...Array(totalPages)].map((_, index) => (
+                                    <button
+                                        key={index}
+                                        className={`py-1 px-3 border rounded ${currentPage === index + 1
+                                            ? "bg-blue-700 text-white"
+                                            : "bg-white text-blue-700"
+                                        }`}
+                                        onClick={() => handlePagination(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -375,26 +387,37 @@ const Forecasting: React.FC = () => {
                             ))}
                             </tbody>
                         </table>
-                        <div className={"flex flex-wrap gap-4 items-center py-4"}>
-                            <Pagination
-                                total={totalPageForecast}
-                                initialPage={1}
-                                onChange={handlePageForecast}
-                                page={currentPageForecast}
-                                variant={"bordered"}/>
+                        {/* Pagination */}
+                        <div className="flex justify-center mt-4 py-4">
+                            <div className="flex space-x-1">
+                                {[...Array(totalPageForecast)].map((_, index) => (
+                                    <button
+                                        key={index}
+                                        className={`py-1 px-3 border rounded ${currentPageForecast === index + 1
+                                            ? "bg-blue-700 text-white"
+                                            : "bg-white text-blue-700"
+                                        }`}
+                                        onClick={() => handlePageForecast(index + 1)}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
+
                     </div>
                 </div>
+
 
                 <div className="overflow-hidden bg-white min-h-fit rounded-sm border
                 border-stroke shadow-default dark:border-strokedark dark:bg-boxdark p-10 mt-5">
                     <div className="flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
                         <div className="flex w-full flex-wrap gap-3 sm:gap-5">
                             <div className="flex min-w-47.5">
-                            <span
-                                className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
-                                <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-                            </span>
+                                <span
+                                    className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
+                                    <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
+                                </span>
                                 <div className="w-56">
                                     <p className="font-semibold text-primary">Total Forecast</p>
                                     {lastItem && (
@@ -404,44 +427,44 @@ const Forecasting: React.FC = () => {
                                     )}
                                 </div>
                                 <div className="flex w-56">
-                                     <span
-                                         className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
+                                    <span
+                                        className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
                                         <span
                                             className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-                                     </span>
+                                    </span>
                                     <div className="flex-col">
                                         <p className="font-semibold text-primary">Np</p>
                                         <p className="text-sm font-medium">{parseFloat(sumForecast.toFixed(3))}</p>
                                     </div>
                                 </div>
                                 <div className="flex w-56">
-                                       <span
-                                           className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
+                                    <span
+                                        className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
                                         <span
                                             className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-                                     </span>
+                                    </span>
                                     <div className="flex-col">
                                         <p className="font-semibold text-primary">Np Limit</p>
                                         <p className="font-sm font-medium">{totalNpLimit}</p>
                                     </div>
                                 </div>
                                 <div className="flex w-56">
-                                     <span
-                                         className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
+                                    <span
+                                        className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
                                         <span
                                             className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-                                     </span>
+                                    </span>
                                     <div className="flex-col">
                                         <p className="font-semibold text-primary">EUR</p>
                                         <p className="font-sm font-medium">{parseFloat(Eur.toFixed(3))}</p>
                                     </div>
                                 </div>
                                 <div className="flex w-56">
-                                     <span
-                                         className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
+                                    <span
+                                        className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
                                         <span
                                             className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-                                     </span>
+                                    </span>
                                     <div className="flex-col">
                                         <p className="font-semibold text-primary">RR</p>
                                         <p className="font-sm font-medium">{parseFloat(RR.toFixed(3))}</p>

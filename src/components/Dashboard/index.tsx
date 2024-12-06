@@ -33,7 +33,6 @@ const Dashboard: React.FC = () => {
         setJumlahData(data)
     }, [products.length]);
 
-    const minData = genapkanKeSeribuan(Math.min(...jumlahData))
     const maxData = genapkanKeSeribuan(Math.max(...jumlahData))
 
     const options: ApexOptions = {
